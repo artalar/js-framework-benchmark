@@ -1,0 +1,258 @@
+{
+  "step": 2,
+  "name": "peek-initial-props",
+  "geos": {
+    "reatom-jsx": 44.01947751413292,
+    "vue": 39.76195245919173
+  },
+  "prev_geos": {
+    "reatom-jsx": 49.72302216774105,
+    "vue": 47.406760774552
+  },
+  "baseline_geos": {
+    "reatom-jsx": 43.59101938415171,
+    "vue": 40.24475797416552
+  },
+  "benches": {
+    "01_run1k": {
+      "reatom": {
+        "total": 68.04,
+        "script": 26,
+        "paint": 41.35333333333333
+      },
+      "vue": {
+        "total": 54.61333333333334,
+        "script": 13.079999999999997,
+        "paint": 40.84
+      },
+      "baseline_reatom_total": 69.05333333333333,
+      "delta_vs_baseline_total": -1.0133333333333212,
+      "delta_vs_step1_total": -3.7199999999999847,
+      "delta_vs_step1_script": -2.086666666666666
+    },
+    "02_replace1k": {
+      "reatom": {
+        "total": 71.68,
+        "script": 29.680000000000003,
+        "paint": 41.25333333333334
+      },
+      "vue": {
+        "total": 57.86,
+        "script": 15.506666666666662,
+        "paint": 41.64666666666667
+      },
+      "baseline_reatom_total": 71.33999999999999,
+      "delta_vs_baseline_total": 0.3400000000000176,
+      "delta_vs_step1_total": -6.659999999999997,
+      "delta_vs_step1_script": -3.359999999999996
+    },
+    "03_update10th1k_x16": {
+      "reatom": {
+        "total": 23.086666666666662,
+        "script": 1.3133333333333335,
+        "paint": 19.653333333333332
+      },
+      "vue": {
+        "total": 26.38,
+        "script": 3.4666666666666672,
+        "paint": 20.993333333333332
+      },
+      "baseline_reatom_total": 24.593333333333337,
+      "delta_vs_baseline_total": -1.5066666666666748,
+      "delta_vs_step1_total": -2.0600000000000023,
+      "delta_vs_step1_script": -0.7133333333333334
+    },
+    "04_select1k": {
+      "reatom": {
+        "total": 6.343999999999999,
+        "script": 0.616,
+        "paint": 4.291999999999999
+      },
+      "vue": {
+        "total": 6.503999999999999,
+        "script": 1.3599999999999997,
+        "paint": 4.052000000000001
+      },
+      "baseline_reatom_total": 5.5360000000000005,
+      "delta_vs_baseline_total": 0.8079999999999989,
+      "delta_vs_step1_total": -0.1880000000000006,
+      "delta_vs_step1_script": -0.08000000000000018
+    },
+    "05_swap1k": {
+      "reatom": {
+        "total": 29.233333333333338,
+        "script": 0.8666666666666668,
+        "paint": 26.12
+      },
+      "vue": {
+        "total": 29.32,
+        "script": 1.5333333333333328,
+        "paint": 25.506666666666668
+      },
+      "baseline_reatom_total": 29.75333333333333,
+      "delta_vs_baseline_total": -0.5199999999999925,
+      "delta_vs_step1_total": -7.379999999999999,
+      "delta_vs_step1_script": 0.053333333333333566
+    },
+    "06_remove-one-1k": {
+      "reatom": {
+        "total": 23.39333333333333,
+        "script": 0.3333333333333333,
+        "paint": 21.82
+      },
+      "vue": {
+        "total": 25.526666666666664,
+        "script": 2.78,
+        "paint": 21.326666666666664
+      },
+      "baseline_reatom_total": 23.486666666666668,
+      "delta_vs_baseline_total": -0.09333333333333727,
+      "delta_vs_step1_total": -4.460000000000001,
+      "delta_vs_step1_script": -0.1466666666666666
+    },
+    "07_create10k": {
+      "reatom": {
+        "total": 667.6066666666667,
+        "script": 212.65333333333334,
+        "paint": 449.9133333333333
+      },
+      "vue": {
+        "total": 561.9866666666666,
+        "script": 99.85999999999999,
+        "paint": 457.68
+      },
+      "baseline_reatom_total": 659.8733333333333,
+      "delta_vs_baseline_total": 7.7333333333333485,
+      "delta_vs_step1_total": -69.36000000000001,
+      "delta_vs_step1_script": -24.986666666666707
+    },
+    "08_create1k-after1k_x2": {
+      "reatom": {
+        "total": 72.02666666666667,
+        "script": 23.926666666666662,
+        "paint": 46.900000000000006
+      },
+      "vue": {
+        "total": 57.580000000000005,
+        "script": 11.253333333333332,
+        "paint": 45.23333333333333
+      },
+      "baseline_reatom_total": 69.56666666666666,
+      "delta_vs_baseline_total": 2.460000000000008,
+      "delta_vs_step1_total": -6.11333333333333,
+      "delta_vs_step1_script": -0.5000000000000036
+    },
+    "09_clear1k_x8": {
+      "reatom": {
+        "total": 26.420000000000005,
+        "script": 23.819999999999997,
+        "paint": 1.966666666666667
+      },
+      "vue": {
+        "total": 18.92,
+        "script": 16.026666666666664,
+        "paint": 2.18
+      },
+      "baseline_reatom_total": 26.413333333333334,
+      "delta_vs_baseline_total": 0.0066666666666712615,
+      "delta_vs_step1_total": -7.839999999999993,
+      "delta_vs_step1_script": -7.586666666666666
+    },
+    "21_ready-memory": {
+      "reatom": {
+        "total": 1.2092647552490234,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 1.3693695068359375,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 1.2248830795288086,
+      "delta_vs_baseline_total": -0.015618324279785156,
+      "delta_vs_step1_total": 0.00368499755859375,
+      "delta_vs_step1_script": null
+    },
+    "22_run-memory": {
+      "reatom": {
+        "total": 6.45591926574707,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 4.209399223327637,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 6.361700057983398,
+      "delta_vs_baseline_total": 0.09421920776367188,
+      "delta_vs_step1_total": 0.061936378479003906,
+      "delta_vs_step1_script": null
+    },
+    "25_run-clear-memory": {
+      "reatom": {
+        "total": 1.6341495513916016,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 2.04488468170166,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 1.622481346130371,
+      "delta_vs_baseline_total": 0.011668205261230469,
+      "delta_vs_step1_total": 0.007991790771484375,
+      "delta_vs_step1_script": null
+    },
+    "41_size-uncompressed": {
+      "reatom": {
+        "total": 30.1,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 63.7,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 29.6,
+      "delta_vs_baseline_total": 0.5,
+      "delta_vs_step1_total": 0.20000000000000284,
+      "delta_vs_step1_script": null
+    },
+    "42_size-compressed": {
+      "reatom": {
+        "total": 10.6,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 22.8,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 10.4,
+      "delta_vs_baseline_total": 0.1999999999999993,
+      "delta_vs_step1_total": 0.09999999999999964,
+      "delta_vs_step1_script": null
+    },
+    "43_first-paint": {
+      "reatom": {
+        "total": 70,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 118.7,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 65.9,
+      "delta_vs_baseline_total": 4.099999999999994,
+      "delta_vs_step1_total": -6.700000000000003,
+      "delta_vs_step1_script": null
+    }
+  }
+}
