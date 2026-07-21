@@ -52,6 +52,14 @@ Create/clear **script** (experimental stack):
 4. Runtime `DEBUG` gates do not shrink the bundle; need compile-time DCE for size.
 5. Next leverage: fewer/lighter per-row bindings and closure/`bind` cost (see closure review if present).
 
+## Closure follow-ups
+
+Deep closure/V8 review of stock `packages/jsx/src/index.ts` (1001.3.0): see [`CLOSURE_ANALYSIS.md`](./CLOSURE_ANALYSIS.md).
+Headline: ~36 function objects + ~11 retained contexts + 5 bound fns per row (~2.5–3.5 KB), matching the run-memory gap. Top levers:
+1. Split `setProp` so static attrs skip the prologue `CreateFunctionContext` (bytecode-verified; 6 of 9 calls/row).
+2. Shared module-scope event dispatcher replacing per-handler `arrow + bind() + thunk` stacks (~10 objects/row).
+3. Trim per-atom construction (`castAtom` bound subscribe, toString/toJSON, `computed()`'s per-call extend arrow) — biggest lever, lives in core.
+
 ## Artifacts
 
 Raw step/exp dumps lived under `reports/opt-step-*` / `opt-fable-*` during the campaign; this file is the collapsed summary. Full narrative also in the PR discussion / agent transcript.
