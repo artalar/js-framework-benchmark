@@ -1,0 +1,115 @@
+diff --git a/packages/jsx/src/index.ts b/packages/jsx/src/index.ts
+index 4be2c36..dd204fb 100644
+--- a/packages/jsx/src/index.ts
++++ b/packages/jsx/src/index.ts
+@@ -205,6 +205,10 @@ let walkTree = (node: Node, visit: (node: Node) => void) => {
+  * then mount refs child-first. Cleanup mirrors both orders below.
+  */
+ let connectNode = (node: Node, symbol: symbol) => {
++  let rootMeta = (node as any)[symbol] as Meta | undefined
++  // After linked-list eager connect, MO delivers the same roots again — skip.
++  if (rootMeta?.mounted && rootMeta.unsubscribes.length > 0) return
++
+   let nodesToMount: Node[] = []
+   walkTree(node, (visited) => {
+     let meta = (visited as any)[symbol] as Meta | undefined
+@@ -219,19 +223,23 @@ let connectNode = (node: Node, symbol: symbol) => {
+   })
+ 
+   for (let i = nodesToMount.length - 1; i >= 0; i--) {
+-    let node = nodesToMount[i]!
+-    let meta = (node as any)[symbol] as Meta | undefined
++    let mountNode = nodesToMount[i]!
++    let meta = (mountNode as any)[symbol] as Meta | undefined
+     // The `mounted` re-check dedupes nodes queued twice by a mid-walk restart.
+     if (!meta || meta.mounted) continue
+ 
+     meta.mounted = true
+-    lifecycle('ref', node, () => {
+-      let unmount = meta.mount?.(node)
++    lifecycle('ref', mountNode, () => {
++      let unmount = meta.mount?.(mountNode)
+       if (typeof unmount === 'function') meta.unmount = unmount
+     })
+   }
+ }
+ 
++let connectAppendedRoots = (roots: Node[], symbol: symbol) => {
++  for (let i = 0; i < roots.length; i++) connectNode(roots[i]!, symbol)
++}
++
+ /**
+  * Unmount refs parent-first, then unsubscribe the batch in reverse DOM order.
+  * This mirrors normal parent-first registration so shared core pubs can use
+@@ -418,18 +426,28 @@ let walkLinkedList = (
+   list: LinkedListJSXAtom,
+ ) => {
+   let lastVersion = -1
++  let symbol = metaSymbol()
++
++  let flushAppendBatch = (appendBatch: DocumentFragment, roots: Node[]) => {
++    element.append(appendBatch)
++    if (element.isConnected && roots.length)
++      connectAppendedRoots(roots, symbol)
++  }
+ 
+   let cb = (state: LinkedList<LLNode<JSX.Element>>) => {
+     if (state.version - 1 > lastVersion) {
+       element.innerHTML = ''
+       let rebuildBatch = dom.document.createDocumentFragment()
++      let rebuildRoots: Node[] = []
+       for (let head = state.head; head; head = head[state.LL_NEXT] ?? null) {
+         throwNativeFragment(head)
+         rebuildBatch.append(head)
++        rebuildRoots.push(head)
+       }
+-      element.append(rebuildBatch)
++      flushAppendBatch(rebuildBatch, rebuildRoots)
+     } else {
+       let appendBatch: undefined | DocumentFragment
++      let appendRoots: Node[] = []
+       for (let change of state.changes) {
+         if (change.kind === 'create') {
+           throwNativeFragment(change.node)
+@@ -437,16 +455,19 @@ let walkLinkedList = (
+           appendBatch ??= dom.document.createDocumentFragment()
+ 
+           appendBatch.append(change.node)
++          appendRoots.push(change.node)
+         } else if (change.kind === 'createMany') {
+           appendBatch ??= dom.document.createDocumentFragment()
+ 
+           for (let node of change.nodes) {
+             throwNativeFragment(node)
+             appendBatch.append(node)
++            appendRoots.push(node)
+           }
+         } else if (appendBatch) {
+-          element.append(appendBatch)
++          flushAppendBatch(appendBatch, appendRoots)
+           appendBatch = undefined
++          appendRoots = []
+         }
+ 
+         if (change.kind === 'remove') {
+@@ -497,7 +518,7 @@ let walkLinkedList = (
+         }
+       }
+ 
+-      if (appendBatch) element.append(appendBatch)
++      if (appendBatch) flushAppendBatch(appendBatch, appendRoots)
+     }
+     lastVersion = state.version
+   }
+@@ -993,7 +1014,10 @@ export let mount = (
+         // Skip nodes that were appended and removed within the same batch:
+         // they never really appeared, so connecting them would run orphan
+         // ref hooks and leak subscriptions with no removal record to come.
+-        if (addedNode.isConnected) connectNode(addedNode, symbol)
++        if (!addedNode.isConnected) return
++        let meta = (addedNode as any)[symbol] as Meta | undefined
++        if (meta?.mounted && meta.unsubscribes.length > 0) return
++        connectNode(addedNode, symbol)
+       })
+     }
+   }
