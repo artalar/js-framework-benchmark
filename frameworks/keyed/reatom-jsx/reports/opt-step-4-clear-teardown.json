@@ -1,0 +1,243 @@
+{
+  "step": 4,
+  "name": "clear-teardown",
+  "geos": {
+    "reatom-jsx": 47.47867900098989,
+    "vue": 43.99740881274712
+  },
+  "prev_geos": {
+    "reatom-jsx": 43.450198739099406,
+    "vue": 40.188949498512955
+  },
+  "baseline_geos": {
+    "reatom-jsx": 43.59101938415171,
+    "vue": 40.24475797416552
+  },
+  "benches": {
+    "01_run1k": {
+      "reatom": {
+        "total": 70.37333333333335,
+        "script": 27.633333333333333,
+        "paint": 42.05333333333333
+      },
+      "vue": {
+        "total": 57.84666666666667,
+        "script": 14.646666666666668,
+        "paint": 42.486666666666665
+      },
+      "baseline_reatom_total": 69.05333333333333,
+      "delta_vs_step3_total": 3.826666666666682,
+      "delta_vs_step3_script": 2.6933333333333316
+    },
+    "02_replace1k": {
+      "reatom": {
+        "total": 72.99333333333333,
+        "script": 30.28666666666667,
+        "paint": 41.99333333333334
+      },
+      "vue": {
+        "total": 56.89333333333333,
+        "script": 15.433333333333334,
+        "paint": 40.77333333333333
+      },
+      "baseline_reatom_total": 71.33999999999999,
+      "delta_vs_step3_total": 3.0933333333333195,
+      "delta_vs_step3_script": 2.1733333333333356
+    },
+    "03_update10th1k_x16": {
+      "reatom": {
+        "total": 23.39333333333333,
+        "script": 1.3333333333333333,
+        "paint": 20.12
+      },
+      "vue": {
+        "total": 25.539999999999996,
+        "script": 3.3333333333333335,
+        "paint": 20.166666666666664
+      },
+      "baseline_reatom_total": 24.593333333333337,
+      "delta_vs_step3_total": 0.18666666666666742,
+      "delta_vs_step3_script": 0.039999999999999813
+    },
+    "04_select1k": {
+      "reatom": {
+        "total": 5.492000000000001,
+        "script": 0.552,
+        "paint": 4.028000000000001
+      },
+      "vue": {
+        "total": 7.168000000000001,
+        "script": 1.656,
+        "paint": 4.448
+      },
+      "baseline_reatom_total": 5.5360000000000005,
+      "delta_vs_step3_total": 0.2840000000000016,
+      "delta_vs_step3_script": 0.10000000000000003
+    },
+    "05_swap1k": {
+      "reatom": {
+        "total": 34.67333333333333,
+        "script": 0.76,
+        "paint": 31.48
+      },
+      "vue": {
+        "total": 34.53333333333333,
+        "script": 2.086666666666667,
+        "paint": 29.82666666666666
+      },
+      "baseline_reatom_total": 29.75333333333333,
+      "delta_vs_step3_total": 6.806666666666665,
+      "delta_vs_step3_script": -0.05333333333333323
+    },
+    "06_remove-one-1k": {
+      "reatom": {
+        "total": 26.046666666666667,
+        "script": 0.42,
+        "paint": 24.366666666666667
+      },
+      "vue": {
+        "total": 29.64666666666666,
+        "script": 3.3,
+        "paint": 24.94
+      },
+      "baseline_reatom_total": 23.486666666666668,
+      "delta_vs_step3_total": 3.126666666666665,
+      "delta_vs_step3_script": 0.10000000000000003
+    },
+    "07_create10k": {
+      "reatom": {
+        "total": 706.0866666666667,
+        "script": 237.98666666666668,
+        "paint": 463.25333333333333
+      },
+      "vue": {
+        "total": 622.4666666666667,
+        "script": 110.21333333333332,
+        "paint": 507.72666666666663
+      },
+      "baseline_reatom_total": 659.8733333333333,
+      "delta_vs_step3_total": 55.306666666666615,
+      "delta_vs_step3_script": 31.246666666666727
+    },
+    "08_create1k-after1k_x2": {
+      "reatom": {
+        "total": 75.69333333333334,
+        "script": 24.886666666666667,
+        "paint": 49.59333333333333
+      },
+      "vue": {
+        "total": 62.75333333333334,
+        "script": 12.459999999999999,
+        "paint": 49.08666666666667
+      },
+      "baseline_reatom_total": 69.56666666666666,
+      "delta_vs_step3_total": 7.63333333333334,
+      "delta_vs_step3_script": 2.693333333333335
+    },
+    "09_clear1k_x8": {
+      "reatom": {
+        "total": 38.48666666666667,
+        "script": 35.29333333333333,
+        "paint": 2.4466666666666663
+      },
+      "vue": {
+        "total": 25.639999999999993,
+        "script": 22.60666666666667,
+        "paint": 2.4
+      },
+      "baseline_reatom_total": 26.413333333333334,
+      "delta_vs_step3_total": 3.780000000000001,
+      "delta_vs_step3_script": 3.706666666666667
+    },
+    "21_ready-memory": {
+      "reatom": {
+        "total": 1.2386913299560547,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 1.3238677978515625,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 1.2248830795288086,
+      "delta_vs_step3_total": 0.06951904296875,
+      "delta_vs_step3_script": null
+    },
+    "22_run-memory": {
+      "reatom": {
+        "total": 6.4143524169921875,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 4.252259254455566,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 6.361700057983398,
+      "delta_vs_step3_total": -0.0223236083984375,
+      "delta_vs_step3_script": null
+    },
+    "25_run-clear-memory": {
+      "reatom": {
+        "total": 1.6597957611083984,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 2.041142463684082,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 1.622481346130371,
+      "delta_vs_step3_total": 0.03723716735839844,
+      "delta_vs_step3_script": null
+    },
+    "41_size-uncompressed": {
+      "reatom": {
+        "total": 30.5,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 63.7,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 29.6,
+      "delta_vs_step3_total": 0.10000000000000142,
+      "delta_vs_step3_script": null
+    },
+    "42_size-compressed": {
+      "reatom": {
+        "total": 10.7,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 22.8,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 10.4,
+      "delta_vs_step3_total": 0.0,
+      "delta_vs_step3_script": null
+    },
+    "43_first-paint": {
+      "reatom": {
+        "total": 72.4,
+        "script": null,
+        "paint": null
+      },
+      "vue": {
+        "total": 121.4,
+        "script": null,
+        "paint": null
+      },
+      "baseline_reatom_total": 65.9,
+      "delta_vs_step3_total": 2.0,
+      "delta_vs_step3_script": null
+    }
+  }
+}
