@@ -63,3 +63,8 @@ Headline: ~36 function objects + ~11 retained contexts + 5 bound fns per row (~2
 ## Artifacts
 
 Raw step/exp dumps lived under `reports/opt-step-*` / `opt-fable-*` during the campaign; this file is the collapsed summary. Full narrative also in the PR discussion / agent transcript.
+
+## Closure-opt follow-up (tried + benched)
+
+Implemented R1/R2/R4–R6 (+ tiny R3 hoist) on a local reatom branch and benched vs Vue.
+See `CLOSURE_OPT_BENCH.md` and `CLOSURE_ANALYSIS.md`. Library clone tip for the experiment: `perf/jsx-closure-opt` (not pushed upstream).
