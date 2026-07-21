@@ -1,0 +1,201 @@
+diff --git a/packages/jsx/src/index.ts b/packages/jsx/src/index.ts
+index 389bfa3..a385aa0 100644
+--- a/packages/jsx/src/index.ts
++++ b/packages/jsx/src/index.ts
+@@ -44,7 +44,7 @@ import type {
+   JSX,
+   LinkedListJSXAtom,
+ } from './jsx'
+-import { reatomClassName } from './utils'
++import { parseClasses, reatomClassName } from './utils'
+ 
+ declare type JSXElement = JSX.Element
+ 
+@@ -106,8 +106,8 @@ export let jsxEvent = action(
+ 
+ interface Meta {
+   boundary: BoundaryHandle | undefined
+-  subscribes: (() => Unsubscribe)[]
+-  unsubscribes: Unsubscribe[]
++  subscribes: (() => Unsubscribe)[] | undefined
++  unsubscribes: Unsubscribe[] | undefined
+   mount: ((element: Node) => ((element: Node) => void) | undefined) | undefined
+   unmount: ((element: Node) => void) | undefined
+   /**
+@@ -121,13 +121,19 @@ interface Meta {
+ let ensureMeta = (node: Node): Meta => {
+   return ((node as any)[metaSymbol()] ??= {
+     boundary: undefined,
+-    subscribes: [],
+-    unsubscribes: [],
++    subscribes: undefined,
++    unsubscribes: undefined,
+     mount: undefined,
+     unmount: undefined,
+     mounted: false,
+   })
+ }
++let metaSubscribes = (meta: Meta) => (meta.subscribes ??= [])
++let metaUnsubscribes = (meta: Meta) => (meta.unsubscribes ??= [])
++let metaHasLiveUnsubs = (meta: Meta | undefined) =>
++  !!meta?.mounted && (meta.unsubscribes?.length ?? 0) > 0
++let propBindingName = (element: Node, key: string) =>
++  peek(DEBUG) ? jsxElementKey(element, key) : undefined
+ export let findBoundary = (node: Node): BoundaryHandle | undefined => {
+   let current: Node | null = node
+   while (current) {
+@@ -166,8 +172,8 @@ let clearJsxError = (marked?: Element): undefined =>
+ 
+ let unlink = (node: Node, subscribe: () => () => void) => {
+   let meta = ensureMeta(node)
+-  meta.subscribes.push(subscribe)
+-  if (node.isConnected) meta.unsubscribes.push(subscribe())
++  metaSubscribes(meta).push(subscribe)
++  if (node.isConnected) metaUnsubscribes(meta).push(subscribe())
+ }
+ 
+ let lifecycle = (phase: 'ref' | 'mount', node: Node, cb: () => void) => {
+@@ -207,16 +213,20 @@ let walkTree = (node: Node, visit: (node: Node) => void) => {
+ let connectNode = (node: Node, symbol: symbol) => {
+   let rootMeta = (node as any)[symbol] as Meta | undefined
+   // After linked-list eager connect, MO delivers the same roots again — skip.
+-  if (rootMeta?.mounted && rootMeta.unsubscribes.length > 0) return
++  if (metaHasLiveUnsubs(rootMeta)) return
+ 
+   let nodesToMount: Node[] = []
+   walkTree(node, (visited) => {
+     let meta = (visited as any)[symbol] as Meta | undefined
+     if (!meta) return
+ 
+-    if (meta.unsubscribes.length === 0) {
+-      for (let subscribe of meta.subscribes) {
+-        lifecycle('mount', visited, () => meta.unsubscribes.push(subscribe()))
++    if ((meta.unsubscribes?.length ?? 0) === 0) {
++      let subscribes = meta.subscribes
++      if (subscribes) {
++        let unsubscribes = metaUnsubscribes(meta)
++        for (let subscribe of subscribes) {
++          lifecycle('mount', visited, () => unsubscribes.push(subscribe()))
++        }
+       }
+     }
+     if (!meta.mounted) nodesToMount.push(visited)
+@@ -268,15 +278,18 @@ let cleanupNodes = (nodes: Node[], symbol: symbol) => {
+     // A node that was never connected (appended and removed in the same tick,
+     // or fresh content inside a removed ancestor) keeps its subscribe thunks
+     // for a future append.
+-    if (!meta.mounted && meta.unsubscribes.length === 0) continue
++    if (!meta.mounted && (meta.unsubscribes?.length ?? 0) === 0) continue
+ 
+-    for (let j = meta.unsubscribes.length - 1; j >= 0; j--) {
+-      lifecycle('mount', node, meta.unsubscribes[j]!)
++    let unsubscribes = meta.unsubscribes
++    if (unsubscribes) {
++      for (let j = unsubscribes.length - 1; j >= 0; j--) {
++        lifecycle('mount', node, unsubscribes[j]!)
++      }
+     }
+ 
+-    meta.unsubscribes = []
++    meta.unsubscribes = undefined
+     // Truly detached nodes are inert if re-appended and release render captures.
+-    meta.subscribes = []
++    meta.subscribes = undefined
+     meta.mounted = false
+   }
+ }
+@@ -721,7 +734,9 @@ let bindSpread = (dom: DomApis, element: JSX.Element, value: any) => {
+   let spread = (val: any) => {
+     marked = clearJsxError(marked)
+     dispose()
+-    let { subscribes, unsubscribes } = ensureMeta(element)
++    let meta = ensureMeta(element)
++    let subscribes = metaSubscribes(meta)
++    let unsubscribes = metaUnsubscribes(meta)
+     let subscribesCount = subscribes.length
+     let unsubscribesCount = unsubscribes.length
+     setProps(dom, element, val)
+@@ -731,7 +746,7 @@ let bindSpread = (dom: DomApis, element: JSX.Element, value: any) => {
+   unlink(element, () => {
+     let source = isAtom(value)
+       ? value
+-      : computed(value, jsxElementKey(element, '$spread'))
++      : computed(value, propBindingName(element, '$spread'))
+     let unsubscribe = source.subscribe(spread, (error) => {
+       marked = reportJsxError(
+         error,
+@@ -806,7 +821,28 @@ let setProp = (dom: DomApis, element: JSX.Element, key: string, value: any) => {
+ 
+   if (key === 'class' || key === 'className') {
+     if (typeof value === 'object' || typeof value === 'function') {
+-      let classAtom = reatomClassName(value)
++      // Simple class getters (bench rows: `() => selected() ? 'danger' : undefined`)
++      // skip the full `reatomClassName` / `parseClasses` object walk.
++      let classAtom =
++        typeof value === 'function'
++          ? computed(() => {
++              let resolved: unknown = value()
++              while (typeof resolved === 'function') resolved = resolved()
++              if (
++                resolved == null ||
++                typeof resolved === 'boolean' ||
++                resolved === ''
++              )
++                return ''
++              if (typeof resolved === 'string') return resolved
++              if (
++                typeof resolved === 'number' ||
++                typeof resolved === 'bigint'
++              )
++                return String(resolved)
++              return parseClasses(resolved as JSX.ClassNameValue)
++            }, propBindingName(element, key))
++          : reatomClassName(value, propBindingName(element, key))
+       let state: unknown
+       try {
+         state = peek(classAtom)
+@@ -862,7 +898,7 @@ let setProp = (dom: DomApis, element: JSX.Element, key: string, value: any) => {
+       }, onPropError),
+     )
+   } else if (typeof value === 'function') {
+-    let computedValue = computed(value, jsxElementKey(element, key))
++    let computedValue = computed(value, propBindingName(element, key))
+     let state: unknown
+     try {
+       state = peek(computedValue)
+@@ -1056,7 +1092,7 @@ export let mount = (
+         // ref hooks and leak subscriptions with no removal record to come.
+         if (!addedNode.isConnected) return
+         let meta = (addedNode as any)[symbol] as Meta | undefined
+-        if (meta?.mounted && meta.unsubscribes.length > 0) return
++        if (metaHasLiveUnsubs(meta)) return
+         connectNode(addedNode, symbol)
+       })
+     }
+diff --git a/packages/jsx/src/leaks.test.tsx b/packages/jsx/src/leaks.test.tsx
+index 59d0eae..be871d5 100644
+--- a/packages/jsx/src/leaks.test.tsx
++++ b/packages/jsx/src/leaks.test.tsx
+@@ -246,6 +246,7 @@ test('linked-list clear drops element meta.subscribes (no render-frame pin)', ()
+ 
+     // Teardown must clear both live unsubscribes and reconnect thunks so
+     // bind()/render closures cannot pin a reatomMap frame state after clear.
+-    expect(row[metaKey].unsubscribes).toEqual([])
+-    expect(row[metaKey].subscribes).toEqual([])
++    // Lazy meta arrays are released to `undefined` rather than empty lists.
++    expect(row[metaKey].unsubscribes ?? []).toEqual([])
++    expect(row[metaKey].subscribes ?? []).toEqual([])
+   }))
+diff --git a/packages/jsx/src/utils.ts b/packages/jsx/src/utils.ts
+index abb2a32..83e8b9f 100644
+--- a/packages/jsx/src/utils.ts
++++ b/packages/jsx/src/utils.ts
+@@ -6,7 +6,7 @@ import type { JSX } from './jsx'
+ // @see https://vuejs.org/guide/essentials/class-and-style.html#binding-html-classes
+ export let reatomClassName = (
+   value: JSX.ClassNameValue,
+-  name: string = named('classNameAtom'),
++  name: string | undefined = named('classNameAtom'),
+ ): Computed<string> => computed(() => parseClasses(value), name)
+ 
+ export let parseClasses = (value: JSX.ClassNameValue): string => {
